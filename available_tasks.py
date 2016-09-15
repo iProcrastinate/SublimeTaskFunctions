@@ -10,11 +10,12 @@ class AvailableTasksCommand(sublime_plugin.TextCommand):
         today_date = time.strftime('%Y-%m-%d')
         self.available_marker = []
         self.markers = []
-        self.view.find_all(r'(^\n*(\s*)(.+)(@start|@due|@started)\((20[1-9][0-9]\-[0-1][0-9]\-[0-3][0-9])\))', 0, "$0,$5", self.markers)
+        self.view.find_all(r'(^\n*(\s*)(.+)(@start|@due|@started)\((20[1-9][0-9]\-[0-1][0-9]\-[0-3][0-9])\))((.*)((\n)|($)))', 0, "$0,,$5,,$6", self.markers)
         for marker in self.markers:
-        
-            if time.strptime(marker.split(',')[1], '%Y-%m-%d') <= time.strptime(today_date, '%Y-%m-%d'):
-                self.available_marker.append(marker.split(',')[0])
+
+            if time.strptime(marker.split(',,')[1], '%Y-%m-%d') <= time.strptime(today_date, '%Y-%m-%d'): 
+                if (re.search('@done', marker.split(',,')[2])) is None:
+                    self.available_marker.append(marker.split(',')[0])
 
         self.view.window().show_quick_panel(self.available_marker, self.goto_task, sublime.MONOSPACE_FONT)
 
